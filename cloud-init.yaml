@@ -1,0 +1,34 @@
+cloud_init:
+  vm_spec:
+  - hostname: "drbd-1"
+    network: "drbd"
+    username: ubuntu                            # vm username
+    password: ubuntu                            # vm password
+    vcpu: 2
+    memory: 4096
+    disks:
+    - {"vda": 20}
+    - {"vdb": 50}
+    ip: "144.144.144.11"
+  - hostname: "drbd-2"
+    network: "drbd"
+    username: ubuntu                            # vm username
+    password: ubuntu                            # vm password
+    vcpu: 2
+    memory: 4096
+    disks:
+    - {"vda": 20}
+    - {"vdb": 50}
+    ip: "144.144.144.12"
+  - hostname: "nfs-client"
+    network: "drbd"
+    username: ubuntu                            # vm username
+    password: ubuntu                            # vm password
+    vcpu: 2
+    memory: 4096
+    disks:
+    - {"vda": 20}
+    - {"vdb": 50}
+    ip: "144.144.144.13"                          # hostname vm
+  
+  # pub_key: /some/path/another_ssh_key       # optional key, default using ~/.ssh/id_rsa.pub

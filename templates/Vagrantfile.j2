@@ -1,0 +1,21 @@
+Vagrant.configure("2") do |config| 
+    {% for vm_name in vm_spec %}config.vm.define "{{ vm_name.hostname }}" do |controller|
+        controller.ssh.username = "ubuntu"
+        controller.ssh.private_key_path = "{{ vm_name.priv_key }}"
+        controller.vm.box = "focal"
+        controller.vm.hostname = "{{ vm_name.hostname }}"
+        controller.vm.network "private_network",
+            type: "dhcp",
+            libvirt__network_name: "{{ vm_name.network }}-network",
+            libvirt__forward_mode: "nat",
+            ip: "{{ vm_name.ip }}"
+        controller.vm.provider "libvirt" do |vm|
+            vm.title = "{{ vm_name.hostname }}"
+            vm.memory = {{ vm_name.memory }}
+            vm.cpus = {{ vm_name.vcpu }}
+            {% for disk in vm_name.disks %}{% for device, size in disk.items() %}{% if device == "vda" %}vm.machine_virtual_size = {{ size }}{% else %}vm.storage :file, :type => "qcow2", :bus => "virtio", :size => {{ size }}, :dev => "{{ device }}"{% endif %}
+            {% endfor %}{% endfor %}vm.storage :file, :device => :cdrom, :bus => :ide, :type => :raw, :path => "{{ vm_name.cloud_init_path }}"
+        end
+    end
+    {% endfor %}
+end

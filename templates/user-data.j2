@@ -1,0 +1,40 @@
+#cloud-config
+hostname: {{ hostname }}
+users:
+  - name: {{ username }}
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    passwd: {{ hashed_password }}
+    lock_passwd: false
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - {{ pub_key }}
+
+apt:
+  disable_suites: [$RELEASE-backports]
+  package_update: true
+  package_upgrade: true
+  sources:
+    linbit-drbd9-stack-ppa:
+      source: ppa:linbit/linbit-drbd9-stack
+    linbit-drbd9-stack: 
+      source: deb https://ppa.launchpadcontent.net/linbit/linbit-drbd9-stack/ubuntu focal main
+
+packages:
+  - drbd-utils
+  - drbd-dkms
+  - pacemaker
+  - pcs
+  - nfs-kernel-server
+  - qemu-guest-agent
+
+write_files:
+  - path: /etc/hosts
+    content: |
+      144.144.144.10 drbd-vip
+      144.144.144.11 drbd-1
+      144.144.144.12 drbd-2
+      144.144.144.13 nfs-client
+    append: true
+
+runcmd:
+  - sudo systemctl enable qemu-guest-agent --now
